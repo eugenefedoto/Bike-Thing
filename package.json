@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "nyc ava",
-    "report": "nyc report --reporter=html",
+    "test": "istanbul cover _mocha",
     "precommit": "lint-staged"
   },
   "lint-staged": {
@@ -16,10 +15,12 @@
   },
   "dependencies": {
     "body-parser": "~1.16.0",
+    "chai": "^4.1.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.0",
     "express": "~4.14.1",
     "hbs": "~4.0.1",
+    "istanbul": "^0.4.5",
     "lodash": "^4.17.4",
     "mongoose": "^4.11.7",
     "morgan": "~1.7.0",
@@ -33,8 +34,10 @@
     "husky": "^0.14.3",
     "lint-staged": "^4.0.3",
     "log4js": "^2.3.3",
+    "mocha": "^3.5.0",
     "mongoose": "^4.11.7",
     "nyc": "^11.1.0",
-    "prettier": "^1.5.3"
+    "prettier": "^1.5.3",
+    "supertest": "^3.0.0"
   }
 }
