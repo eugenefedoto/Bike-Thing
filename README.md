@@ -1,5 +1,7 @@
 # Bike network location finder
 
+[![Build Status](https://travis-ci.org/travis-ci/travis-web.svg?branch=master)](https://travis-ci.org/travis-ci/travis-web)
+
 ## What is this project
 
 This project is meant to be a teaching/learning tool for junior engineers and people that want to learn how to work in a team.
