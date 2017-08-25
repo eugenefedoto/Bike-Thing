@@ -1,8 +1,10 @@
 // Important: must have MongoDB running with seeded data.
 
 const supertest = require("supertest");
-const app = require("../app");
+const app = require("../../app");
 const expect = require("chai").expect;
+const sinon = require("sinon");
+const mongoose = require("mongoose");
 
 // Helper functions for assertion
 function isObject(res) {
@@ -13,7 +15,7 @@ function hasBody(res) {
   expect(res).to.have.property("body");
 }
 
-describe("/networks route", () => {
+describe("integration -- /networks route", () => {
   let request;
   beforeEach(() => {
     request = supertest(app).get("/networks").set("Accept", "application/json");

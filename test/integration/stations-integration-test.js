@@ -1,7 +1,7 @@
 // Important: must have MongoDB running with seeded data.
 
 const supertest = require("supertest");
-const app = require("../app");
+const app = require("../../app");
 const expect = require("chai").expect;
 
 // Helper functions for assertion
