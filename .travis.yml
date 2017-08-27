@@ -10,4 +10,4 @@ packages:
   apt:
    - mongodb-org-tools
 before_script:
- - mongorestore -d dbName ./mongoDump/dbName
+ - mongorestore -d dbName ./test/fixtures

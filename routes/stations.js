@@ -1,18 +1,20 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 
-var mongoose = require('mongoose');
-var Network = mongoose.model('Network');
-var Station = mongoose.model('Station');
-var Review = mongoose.model('Review');
+var mongoose = require("mongoose");
+var Network = mongoose.model("Network");
+var Station = mongoose.model("Station");
+var Review = mongoose.model("Review");
 
 /* GET one station given _id. */
-router.get('/:_id', function(req, res, next) {
-  Station.findById(mongoose.Types.ObjectId(req.params._id), function(err, station) {
-    if(err) {
+router.get("/:_id", function(req, res, next) {
+  Station.findById(mongoose.Types.ObjectId(req.params._id), function(
+    err,
+    station
+  ) {
+    if (err) {
       console.log(err);
-    }
-    else {
+    } else {
       res.json(station);
     }
   });
@@ -24,22 +26,41 @@ router.get('/:_id', function(req, res, next) {
   => isClosed
   => isSafe
 */
-router.put('/:_id', function(req, res, next) {
-  Station.findById(mongoose.Types.ObjectId(req.params._id), function(err, station) {
-    if(err) {
+router.put("/:_id", function(req, res, next) {
+  Station.findById(mongoose.Types.ObjectId(req.params._id), function(
+    err,
+    station
+  ) {
+    if (
+      err ||
+      req.body.empty_slots < 0 ||
+      (typeof req.body.isClosed !== "boolean" &&
+        req.body.isClosed !== undefined) ||
+      (typeof req.body.isSafe !== "boolean" && req.body.isSafe !== undefined)
+    ) {
       res.status(500).send(err);
-    }
-    else {
-      station.empty_slots = req.body.empty_slots || station.empty_slots;
-      //TODO: booleans dont change properly, bad input defaults to true (not intended)
-      //station.isClosed = req.body.isClosed; 
-      //station.isSafe = req.body.isSafe || station.isSafe;
+    } else {
+      if (req.body.empty_slots === undefined) {
+        station.empty_slots = station.empty_slots;
+      } else {
+        station.empty_slots = req.body.empty_slots;
+      }
+      if (req.body.isClosed === undefined) {
+        station.isClosed = station.isClosed;
+      } else {
+        station.isClosed = req.body.isClosed;
+      }
+      if (req.body.isSafe === undefined) {
+        station.isSafe = station.isSafe;
+      } else {
+        station.isSafe = req.body.isSafe;
+      }
 
       station.save((err, station) => {
-          if(err) {
-            res.status(500).send(err);
-          }
-          res.send(station);
+        if (err) {
+          res.status(500).send(err);
+        }
+        res.send(station);
       });
     }
   });

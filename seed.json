@@ -1,0 +1,4 @@
+{
+	"development": "localhost/development",
+	"production": "localhost/production"
+}
