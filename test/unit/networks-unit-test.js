@@ -2,7 +2,7 @@ const sinon = require("sinon");
 const mongoose = require("mongoose");
 require("../../app");
 const Network = mongoose.model("Network");
-const NetworkMock = sinon.mock(Network);
+
 const networks = [
   {
     _id: "5993a2be0d43ff1e8c7f72e0",
@@ -39,7 +39,15 @@ const networks = [
   }
 ];
 
-describe.only("unit -- /networks route", done => {
+let NetworkMock;
+
+beforeEach(() => {
+  NetworkMock = sinon.mock(Network);
+});
+
+describe("unit -- /networks route", done => {
+  // GET /networks
+  // Response: success/200
   it("returns a JSON response", function(done) {
     const arg1 = {};
     const arg2 = function(err, networks) {
@@ -53,6 +61,63 @@ describe.only("unit -- /networks route", done => {
 
     Network.find(arg1, arg2);
 
+    NetworkMock.verify();
+    NetworkMock.restore();
+    done();
+  });
+});
+
+describe("unit -- /networks/:_id route", () => {
+  // GET /networks/5993a2be0d43ff1e8c7f72e0
+  // Response: success/200
+  it("returns an existing network", done => {
+    const arg1 = mongoose.Types.ObjectId("5993a2be0d43ff1e8c7f72e0");
+    const arg2 = function(err, network) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(network);
+      }
+    };
+    const network = {
+      company: ["Cyacle Bicycle Rental LLC"],
+      location: {
+        city: "Abu Dhabi",
+        country: "AE",
+        latitude: 24.450278,
+        longitude: 54.39
+      },
+      name: "ADCB Bikeshare",
+      _id: "5993a2be0d43ff1e8c7f72e0"
+    };
+
+    NetworkMock.expects("findById").withArgs(arg1, arg2).resolves(network);
+
+    Network.findById(arg1, arg2);
+    NetworkMock.verify();
+    NetworkMock.restore();
+    done();
+  });
+
+  // GET /networks/zxzxzxzxxzxxzcacas
+  // Response: error/500
+  it("returns an error/500 for a non-existing network", done => {
+    const network = {
+      _id: "zxzxzxzxxzxxzcacas"
+    };
+
+    const arg1 = mongoose.Types.ObjectId("5993a2be0d43ff1e8c7f72e0");
+    const arg2 = function(err, network) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(network);
+      }
+    };
+
+    NetworkMock.expects("findById").withArgs(arg1, arg2).resolves(network);
+
+    Network.findById(arg1, arg2);
     NetworkMock.verify();
     NetworkMock.restore();
     done();

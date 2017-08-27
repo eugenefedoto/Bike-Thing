@@ -1,70 +1,94 @@
-// Important: must have MongoDB running with seeded data.
+// Important: must have MongoDB running
 
 const supertest = require("supertest");
 const app = require("../../app");
 const expect = require("chai").expect;
+const mongoose = require("mongoose");
 
-// Helper functions for assertion
-function isObject(res) {
-  expect(res).to.be.an("object");
-}
-
-function hasBody(res) {
-  expect(res).to.have.property("body");
-}
-
-describe("/stations/:_id route", () => {
+describe("integration -- /stations/:_id route", () => {
   let request;
   beforeEach(() => {
-    request = supertest(app)
+    request = supertest(app);
   });
 
-  // GET /stations?_id=6435602c7151bc587e0d15a2c5dc99ab
-  // Response: success/200
-  it("returns an existing station", done => {
-    function hasExistingStation(res) {
-      expect(res.body).to.eql(station);
-    }
+  const station = {
+    empty_slots: 5,
+    free_bikes: 6,
+    _id: "5993a2bf0d43ff1e8c7f72e1",
+    latitude: 24.537567,
+    longitude: 54.42835099999999,
+    name: "St. Regis",
+    isClosed: true,
+    isSafe: true,
+    network_id: "5993a2be0d43ff1e8c7f72e0"
+  };
 
-    const station = {
-      empty_slots: 5,
-      free_bikes: 6,
-      _id: "5993a2bf0d43ff1e8c7f72e1",
-      latitude: 24.537567,
-      longitude: 54.42835099999999,
-      name: "St. Regis",
-      isClosed: true,
-      isSafe: true,
-      network_id: "5993a2be0d43ff1e8c7f72e0"
-    };
-
+  it("GET a station and return its JSON", done => {
     request
       .get("/stations/" + station._id)
-      .set("Accept", "application/json")
-      .expect("Content-Type", /json/)
-      .expect(isObject)
-      .expect(hasBody)
-      .expect(hasExistingStation)
-      .expect(200, done);
+      .expect(station)
+      .expect(200)
+      .end(done);
   });
 
-  // GET /stations?_id=xvzvzvxzvdsvsv
-  // Response: error/404
-  it("returns an error/404 for a non-existing network", done => {
-    function doesNotHaveExistingStation(res) {
-      expect(res.body).to.not.eql(station);
-    }
-
-    const station = {
-      _id: "xvzvzvxzvdsvsv"
-    };
-
+  it("PUT a station with valid empty_slots and return its updated JSON", done => {
     request
-      .get("/stations/" + station._id)
-      .expect("Content-Type", /text/)
-      .expect(isObject)
-      .expect(hasBody)
-      .expect(doesNotHaveExistingStation)
-      .expect(500, done);
+      .put("/stations/" + station._id)
+      .send({ empty_slots: 2 })
+      .expect(function(res) {
+        expect(res.body.empty_slots).to.be.equal(2);
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  it("PUT a station with invalid empty_slots and return a 500 error", done => {
+    request
+      .put("/stations/" + station._id)
+      .send({ empty_slots: -1 })
+      .expect(500)
+      .end(done);
+  });
+
+  it("PUT a station with valid isClosed and return its updated JSON", done => {
+    request
+      .put("/stations/" + station._id)
+      .send({ isClosed: false })
+      .expect(function(res) {
+        expect(res.body.isClosed).to.be.equal(false);
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  it("PUT a station with invalid isClosed and return a 500 error", done => {
+    request
+      .put("/stations/" + station._id)
+      .send({ isClosed: 1 })
+      .expect(500)
+      .end(done);
+  });
+
+  it("PUT a station with valid isSafe and return its updated JSON", done => {
+    request
+      .put("/stations/" + station._id)
+      .send({ isSafe: false })
+      .expect(function(res) {
+        expect(res.body.isSafe).to.be.equal(false);
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  it("PUT a station with invalid isSafe and return a 500 error", done => {
+    request
+      .put("/stations/" + station._id)
+      .send({ isSafe: 1 })
+      .expect(500)
+      .end(done);
+  });
+
+  it("GET a non-existing station and return a 500 error", done => {
+    request.get("/stations/zxzxzxzxxzxxzcacas").expect(500).end(done);
   });
 });

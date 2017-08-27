@@ -3,53 +3,30 @@
 const supertest = require("supertest");
 const app = require("../../app");
 const expect = require("chai").expect;
-const sinon = require("sinon");
 const mongoose = require("mongoose");
-
-// Helper functions for assertion
-function isObject(res) {
-  expect(res).to.be.an("object");
-}
-
-function hasBody(res) {
-  expect(res).to.have.property("body");
-}
 
 describe("integration -- /networks route", () => {
   let request;
   beforeEach(() => {
-    request = supertest(app).get("/networks").set("Accept", "application/json");
+    request = supertest(app).get("/networks");
   });
 
-  // GET /networks
-  // Response: success/200
-  it("returns a JSON response", done => {
-    request
-      .expect("Content-Type", /json/)
-      .expect(isObject)
-      .expect(hasBody)
-      .expect(hasArrayLength)
-      .expect(200, done);
-
-    function hasArrayLength(res) {
-      expect(res.body).be.an("array").and.to.have.lengthOf(550);
+  it("GET all networks and return all their JSON", done => {
+    function hasArrayOfLength(res) {
+      expect(res.body).to.be.an("array").and.to.have.lengthOf(1189);
     }
+
+    request.expect(hasArrayOfLength).expect(200).end(done);
   });
 });
 
-describe("/networks/:_id route", () => {
+describe("integration -- /networks/:_id route", () => {
   let request;
   beforeEach(() => {
     request = supertest(app);
   });
 
-  // GET /networks/5993a2be0d43ff1e8c7f72e0
-  // Response: success/200
-  it("returns an existing network", done => {
-    function hasExistingNetwork(res) {
-      expect(res.body).to.eql(network);
-    }
-
+  it("GET a network and return its JSON", done => {
     const network = {
       company: ["Cyacle Bicycle Rental LLC"],
       location: {
@@ -62,33 +39,14 @@ describe("/networks/:_id route", () => {
       _id: "5993a2be0d43ff1e8c7f72e0"
     };
 
-    request
-      .get("/networks/" + network._id)
-      .set("Accept", "application/json")
-      .expect("Content-Type", /json/)
-      .expect(isObject)
-      .expect(hasBody)
-      .expect(hasExistingNetwork)
-      .expect(200, done);
+    request.get("/networks/" + network._id).expect(network).expect(200, done);
   });
 
-  // GET /networks/zxzxzxzxxzxxzcacas
-  // Response: error/404
-  it("returns an error/404 for a non-existing network", done => {
-    function doesNotHaveExistingNetwork(res) {
-      expect(res.body).to.not.eql(network);
-    }
-
+  it("GET a non-existing network and return a 500 error", done => {
     const network = {
       _id: "zxzxzxzxxzxxzcacas"
     };
 
-    request
-      .get("/networks/" + network._id)
-      .expect("Content-Type", /text/)
-      .expect(isObject)
-      .expect(hasBody)
-      .expect(doesNotHaveExistingNetwork)
-      .expect(500, done);
+    request.get("/networks/" + network._id).expect(500).end(done);
   });
 });
