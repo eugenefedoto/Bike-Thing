@@ -96,6 +96,18 @@ describe("integration -- /reviews", () => {
     request.post("/reviews/").send(review).expect(500).end(done);
   });
 
+  it("reject POST with a non-integer rating", done => {
+    const review = {
+      station_id: "5993a2bf0d43ff1e8c7f72e1",
+      network_id: "5993a2be0d43ff1e8c7f72e0",
+      author: "Mark Zuck",
+      star_rating: 1.5,
+      content:
+        "Amazing service. Clean bikes. A+++++. Would use again. This stations makes every day brighter, and every journey better. No problems ever encountered. High availability."
+    };
+    request.post("/reviews/").send(review).expect(500).end(done);
+  });
+
   it("reject POST with a review < 140 chars length", done => {
     const review = {
       station_id: "5993a2bf0d43ff1e8c7f72e1",
